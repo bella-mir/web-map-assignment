@@ -1,0 +1,115 @@
+{
+  "version": 8,
+  "name": "Empty Style",
+  "metadata": {"maputnik:renderer": "mlgljs"},
+  "sources": {
+    "e20m7ul": {
+      "type": "vector",
+      "url": "https://wms.wheregroup.com/tileserver/tile/world-0-14.json"
+    }
+  },
+  "sprite": "",
+  "glyphs": "https://orangemug.github.io/font-glyphs/glyphs/{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "id": "Background",
+      "type": "background",
+      "paint": {"background-color": "#F9F4F1"}
+    },
+    {
+      "id": "Parks",
+      "type": "fill",
+      "source": "e20m7ul",
+      "source-layer": "park",
+      "filter": ["==", "$type", "Polygon"],
+      "layout": {"visibility": "visible"},
+      "paint": {
+        "fill-opacity": {"base": 1.8, "stops": [[9, 0.5], [12, 0.8]]},
+        "fill-color": "#E8EDDF"
+      }
+    },
+    {
+      "id": "Mountains",
+      "type": "circle",
+      "source": "e20m7ul",
+      "source-layer": "mountain_peak",
+      "filter": ["all", ["==", "class", "railway"]],
+      "layout": {"visibility": "visible"},
+      "paint": {
+        "circle-stroke-color": "rgba(0, 255, 0, 1)",
+        "circle-color": "rgba(0, 255, 0, 1)"
+      }
+    },
+    {
+      "id": "LanduseResidential",
+      "type": "fill",
+      "source": "e20m7ul",
+      "source-layer": "landuse",
+      "filter": ["==", "class", "residential"],
+      "layout": {"visibility": "visible"},
+      "paint": {"fill-color": "#F2EAE4"}
+    },
+    {
+      "id": "Water",
+      "type": "fill",
+      "source": "e20m7ul",
+      "source-layer": "water",
+      "layout": {"visibility": "visible"},
+      "paint": {"fill-color": "#9BBCBF", "fill-translate-anchor": "map"}
+    },
+    {
+      "id": "Railways",
+      "type": "line",
+      "source": "e20m7ul",
+      "source-layer": "transportation",
+      "filter": ["all", ["==", "class", "rail"]],
+      "layout": {"visibility": "visible"},
+      "paint": {"line-color": "hsla(0, 0%, 73%, 0.77)", "line-width": 2}
+    },
+    {
+      "id": "RailwaysDash",
+      "type": "line",
+      "source": "e20m7ul",
+      "source-layer": "transportation",
+      "filter": ["all", ["==", "class", "rail"]],
+      "layout": {"visibility": "visible"},
+      "paint": {
+        "line-color": "rgba(255, 255, 255, 1)",
+        "line-width": 2,
+        "line-dasharray": [2, 6]
+      }
+    },
+    {
+      "id": "Country's Boundary",
+      "type": "line",
+      "source": "e20m7ul",
+      "source-layer": "boundary",
+      "minzoom": 0,
+      "filter": ["all", ["in", "admin_level", 2], ["!=", "maritime", 1]],
+      "layout": {"visibility": "visible"},
+      "paint": {
+        "line-color": "rgb(217, 213, 210, 1)",
+        "line-width": {
+          "base": 1,
+          "stops": [[0, 0.6], [4, 1.4], [5, 2], [12, 8]]
+        }
+      }
+    },
+    {
+      "id": "Buildings",
+      "type": "fill",
+      "source": "e20m7ul",
+      "source-layer": "building",
+      "minzoom": 0,
+      "paint": {"fill-color": "rgba(207, 200, 194, 0.41)"}
+    },
+    {
+      "id": "Major Roads",
+      "type": "line",
+      "source": "e20m7ul",
+      "source-layer": "transportation_name",
+      "paint": {"line-color": "#F2DEA2", "line-width": 2}
+    }
+  ],
+  "id": "he8iizz"
+}
