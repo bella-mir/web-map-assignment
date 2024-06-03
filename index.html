@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MapLibre Map Example</title>
+    <link
+      href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="title">The World Capitals</div>
+      <img class="info_icon" src="info_icon.svg" />
+    </header>
+    <input type="checkbox" id="modal-toggle" />
+
+    <div id="map"></div>
+
+    <div class="modal">
+      <div class="modal_content">
+        <span
+          class="close"
+          onclick="document.getElementById('modal-toggle').checked = false;"
+          >&times;</span
+        >
+        <h2>About the map</h2>
+        <h4>General Info</h4>
+        <span
+          >This is a study project (Assignment 3) in the Webmapping class. It
+          aims to learn how to create a basemap style for vector tiles and
+          explore the maplibre.gl javascript library. It displays the capitals
+          of all countries around the world.</span
+        >
+        <h4>Basemap</h4>
+        <span
+          >Basemap is styled at Maputnik using data from
+          <a href="https://openmaptiles.org/"> © OpenMapTiles</a></span
+        >
+        <ul>
+          <li>
+            The basemap is created for different zoom levels, allowing us to
+            explore the world view as well as zoom into particular cities. By
+            clicking on the capital symbol, we can fly to it and see the city at
+            a larger scale.
+          </li>
+          <li>
+            <strong>Admin boundaries:</strong> As we look at the world's capital
+            cities, it is important to show the administrative boundaries at
+            different levels. For this purpose, I have three layers: country
+            boundaries (admin_level=2), sub-national jurisdictions
+            (admin_level=4), and districts (admin_level=8). All layers change
+            the width of the border based on the zoom level to achieve good
+            visual hierarchy.
+          </li>
+          <li>
+            <strong>Countries' Name:</strong>
+            are displayed on the map. I have added English name as well as local
+            name for countries that uses non-latin alphabet
+          </li>
+          <li>
+            <strong>Cities' Names</strong>
+            are displayed on the map. Minimal zoom set to 5, not to see its
+            names on smaller scales.
+          </li>
+          <li>
+            <strong>Railways:</strong> The railways layer is filtered data from
+            the initial "transportation" layer source. It shows the rail lines
+            at particular zoom levels. For visualization purposes, the layer is
+            divided into two: to show the dashed line on the solid line.
+          </li>
+          <li>
+            <strong>Buildings:</strong> The layer is shown only at zoom levels
+            higher than 13, when the users want to explore cities or other
+            territories at a larger scale.
+          </li>
+          <li>
+            <strong>Landiгe (residential, commercial, industrial):</strong>
+            The initial layer landuse is split to three and filtered to show
+            residential, commercial and industrial territories
+          </li>
+          <li>
+            <strong>Water:</strong>
+            A simple fill layer that shows water areas all around the world.
+          </li>
+          <li>
+            <strong>Parks:</strong>
+            A simple fill layer, but the color is very important as it is the
+            prevalent color of the map when we first open it.
+          </li>
+          <li>
+            <strong>Post Offices:</strong>
+            filtered POI layer to shoe all the post offices, just in case you
+            ant to send the postcard to ypur grandma
+          </li>
+          <li>
+            <strong>Background:</strong>
+            This layer is added to change the initial color of the canvas.
+          </li>
+        </ul>
+        <h4>Data</h4>
+        <span
+          >Geodata for world capitals is derived from Natural Earth Data (CC0).
+          Free vector and raster map data
+          <a href="https://www.naturalearthdata.com/"
+            >@ naturalearthdata.com.</a
+          >
+        </span>
+        <div class="modal_main">
+          <div class="assignment_box">
+            <h4>Assignment Note (Extras)</h4>
+            <div class="assignmentBox">
+              <div class="flexColumn">
+                <div class="assignmentSection">
+                  <strong>Map:</strong>
+                  <ol>
+                    <li>
+                      Additional GeoJSON layer with all the world capitals
+                    </li>
+                    <li>Popover with capital name and country on hover</li>
+                    <li>Fly to location on click on the capital</li>
+                    <li>
+                      Custom marker (picture) for one of the locations (Vienna)
+                      with a popup on click
+                    </li>
+                    <li>Custom marker changes its size on hover</li>
+                    <li>
+                      Center, start zoom, max-boundaries, max zoom are set
+                    </li>
+                    <li>
+                      Added Geolocate control: to show the current location of
+                      the user
+                    </li>
+                  </ol>
+                </div>
+                <div class="assignmentSection">
+                  <strong>Other:</strong>
+                  <ol>
+                    <li>Modal window with information about the project</li>
+                    <li>
+                      <span>
+                        The page is deployed on GitHub Pages. You can access it
+                        <a
+                          href="https://bella-mir.github.io/web-map-assignment/"
+                          target="_blank"
+                          >here</a
+                        >.
+                      </span>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+    <script>
+      const map = new maplibregl.Map({
+        container: "map",
+        // style: "https://wms.wheregroup.com/tileserver/style/osm-bright.json",
+        // style:
+        //   "https://raw.githubusercontent.com/bella-mir/web-map-assignment/main/basemap_style.json",
+        style: {
+          version: 8,
+          name: "Empty Style",
+          metadata: { "maputnik:renderer": "mlgljs" },
+          sources: {
+            e20m7ul: {
+              type: "vector",
+              url: "https://wms.wheregroup.com/tileserver/tile/world-0-14.json",
+            },
+          },
+          sprite: "",
+          glyphs:
+            "https://orangemug.github.io/font-glyphs/glyphs/{fontstack}/{range}.pbf",
+          layers: [
+            {
+              id: "Background",
+              type: "background",
+              layout: { visibility: "visible" },
+              paint: { "background-color": "#F9F4F1" },
+            },
+            {
+              id: "Parks",
+              type: "fill",
+              source: "e20m7ul",
+              "source-layer": "park",
+              filter: ["==", "$type", "Polygon"],
+              layout: { visibility: "visible" },
+              paint: {
+                "fill-opacity": {
+                  base: 1.8,
+                  stops: [
+                    [9, 0.5],
+                    [12, 0.8],
+                  ],
+                },
+                "fill-color": "#E8EDDF",
+              },
+            },
+            {
+              id: "Water",
+              type: "fill",
+              source: "e20m7ul",
+              "source-layer": "water",
+              layout: { visibility: "visible" },
+              paint: {
+                "fill-translate-anchor": "map",
+                "fill-color": "#a0c8f0",
+              },
+            },
+            {
+              id: "Landuse_industrial",
+              type: "fill",
+              source: "e20m7ul",
+              "source-layer": "landuse",
+              filter: ["all", ["==", "class", "industrial"]],
+              paint: { "fill-color": "\t#DCDCDC" },
+            },
+            {
+              id: "Landuse_commercial",
+              type: "fill",
+              source: "e20m7ul",
+              "source-layer": "landuse",
+              filter: ["all", ["==", "class", "commercial"]],
+              paint: { "fill-color": "#F2E3E1" },
+            },
+            {
+              id: "Landuse_residential",
+              type: "fill",
+              source: "e20m7ul",
+              "source-layer": "landuse",
+              filter: ["==", "class", "residential"],
+              layout: { visibility: "visible" },
+              paint: { "fill-color": "#F2EAE4" },
+            },
+            {
+              id: "Railways_solid",
+              type: "line",
+              source: "e20m7ul",
+              "source-layer": "transportation",
+              filter: ["all", ["==", "class", "rail"]],
+              layout: { visibility: "visible" },
+              paint: { "line-color": "#aa917c", "line-width": 2 },
+            },
+            {
+              id: "Railways_dash",
+              type: "line",
+              source: "e20m7ul",
+              "source-layer": "transportation",
+              filter: ["all", ["==", "class", "rail"]],
+              layout: { visibility: "visible" },
+              paint: {
+                "line-color": "rgba(255, 255, 255, 1)",
+                "line-width": 2,
+                "line-dasharray": [2, 4],
+              },
+            },
+            {
+              id: "Buildings",
+              type: "fill",
+              source: "e20m7ul",
+              "source-layer": "building",
+              minzoom: 0,
+              paint: { "fill-color": "rgba(207, 200, 194, 0.41)" },
+            },
+            {
+              id: "Major Roads",
+              type: "line",
+              source: "e20m7ul",
+              "source-layer": "transportation_name",
+              paint: { "line-color": "#F2DEA2", "line-width": 2 },
+            },
+            {
+              id: "PostOffices",
+              type: "circle",
+              source: "e20m7ul",
+              "source-layer": "poi",
+              filter: ["all", ["==", "class", "post"]],
+              paint: {
+                "circle-pitch-scale": "map",
+                "circle-stroke-opacity": 1,
+                "circle-stroke-color": "white",
+                "circle-color": "#0066b2",
+              },
+            },
+            {
+              id: "AdminBoundaries_largeUnits",
+              type: "line",
+              source: "e20m7ul",
+              "source-layer": "boundary",
+              minzoom: 2,
+              filter: ["all", ["in", "admin_level", 4], ["!=", "maritime", 1]],
+              paint: {
+                "line-color": {
+                  stops: [
+                    [6, "rgb(220, 220, 220, 1)"],
+                    [10, "rgb(200, 200, 200, 1)"],
+                  ],
+                },
+                "line-width": {
+                  base: 0.5,
+                  stops: [
+                    [0, 0.5],
+                    [4, 0.5],
+                    [5, 1],
+                    [12, 3],
+                  ],
+                },
+              },
+            },
+            {
+              id: "AdminBoundaries_smallUnits",
+              type: "line",
+              source: "e20m7ul",
+              "source-layer": "boundary",
+              filter: [
+                "all",
+                ["in", "admin_level", 6, 8],
+                ["!=", "maritime", 1],
+              ],
+              paint: { "line-color": "rgb(220, 220, 220, 1)", "line-width": 2 },
+            },
+            {
+              id: "AdminBoundaries_countries",
+              type: "line",
+              source: "e20m7ul",
+              "source-layer": "boundary",
+              minzoom: 0,
+              filter: ["all", ["in", "admin_level", 2], ["!=", "maritime", 1]],
+              layout: { visibility: "visible" },
+              paint: {
+                "line-color": "rgb(200, 200, 210, 1)",
+                "line-width": {
+                  base: 1,
+                  stops: [
+                    [0, 1],
+                    [4, 2],
+                    [5, 4],
+                    [12, 8],
+                  ],
+                },
+              },
+            },
+            {
+              id: "Names_countrie",
+              type: "symbol",
+              source: "e20m7ul",
+              "source-layer": "place",
+              filter: ["all", ["==", "class", "country"]],
+              layout: {
+                "text-font": ["Open Sans Bold"],
+                "text-field": "{name:en}\n{name:nonlatin}",
+                "text-size": {
+                  stops: [
+                    [3, 11],
+                    [6, 17],
+                  ],
+                },
+                "text-transform": "uppercase",
+                "icon-text-fit": "none",
+              },
+              paint: {
+                "text-halo-blur": 1,
+                "text-color": "#2d4b73",
+                "text-halo-width": 1,
+                "text-halo-color": "rgba(255,255,255,0.9)",
+              },
+            },
+            {
+              id: "Names_cities",
+              type: "symbol",
+              source: "e20m7ul",
+              "source-layer": "place",
+              minzoom: 5,
+              filter: ["all", ["==", "class", "city"]],
+              layout: {
+                "text-letter-spacing": 0,
+                "text-size": {
+                  stops: [
+                    [6, 12],
+                    [10, 18],
+                  ],
+                },
+                "text-font": ["Open Sans Semi Bold"],
+                "text-field": "{name:en}",
+                "text-max-width": 8,
+              },
+              paint: {
+                "text-halo-width": 1,
+                "text-halo-color": "rgba(255,255,255,0.8)",
+                "text-color": "#213547",
+              },
+            },
+          ],
+          id: "he8iizz",
+        },
+        center: [16, 53],
+        zoom: 1,
+        maxZoom: 15,
+      });
+
+      const bounds = [
+        [-170, -75],
+        [189, 85],
+      ];
+
+      fetch(
+        "https://raw.githubusercontent.com/bella-mir/web-map-assignment/main/capitals.geojson"
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          map.on("load", () => {
+            map.addSource("capitals", {
+              type: "geojson",
+              data: data,
+            });
+
+            map.addLayer({
+              id: "capitals-layer",
+              type: "circle",
+              source: "capitals",
+              paint: {
+                "circle-radius": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  5,
+                  4,
+                  10,
+                  10,
+                ],
+                "circle-color": "#F2A2E6",
+                "circle-stroke-color": "#F5EDC4",
+                "circle-stroke-width": 1,
+              },
+            });
+
+            const popup = new maplibregl.Popup({
+              closeButton: false,
+              closeOnClick: false,
+            });
+
+            map.on("click", "capitals-layer", (e) => {
+              const coordinates = e.features[0].geometry.coordinates.slice();
+              map.flyTo({
+                center: coordinates,
+                zoom: 10,
+              });
+            });
+
+            map.on("mouseenter", "capitals-layer", (e) => {
+              map.getCanvas().style.cursor = "pointer";
+              const coordinates = e.features[0].geometry.coordinates.slice();
+              const capitalName = e.features[0].properties["name"];
+              const capitalCountry = e.features[0].properties["sov0name"];
+              popup
+                .setLngLat(coordinates)
+                .setHTML(`${capitalName}, ${capitalCountry}`)
+                .addTo(map);
+            });
+
+            map.on("mouseleave", "capitals-layer", () => {
+              map.getCanvas().style.cursor = "";
+              popup.remove();
+            });
+          });
+        })
+        .catch((error) =>
+          console.error("Error fetching the GeoJSON data:", error)
+        );
+
+      const popup = new maplibregl.Popup({ offset: 25 }).setText(
+        "Hey, there! You are in Vienna"
+      );
+
+      const el = document.createElement("div");
+      el.id = "marker";
+
+      new maplibregl.Marker({ element: el })
+        .setLngLat([16.3646931, 48.2019611])
+        .setPopup(popup)
+        .addTo(map);
+      map.addControl(new maplibregl.NavigationControl());
+      map.addControl(
+        new maplibregl.GeolocateControl({
+          positionOptions: {
+            enableHighAccuracy: true,
+          },
+          trackUserLocation: true,
+        })
+      );
+      map.setMaxBounds(bounds);
+    </script>
+  </body>
+</html>
